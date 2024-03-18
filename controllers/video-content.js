@@ -28,17 +28,21 @@ const createVideoContent = async (req, res) => {
 
     const imageUrls = [];
     const audioUrls = [];
+    const durationInSeconds = [];
 
     for (let i = 0; i < imagePrompts.length; i++) {
       console.log("getting image " + i);
-      getImage(imagePrompts[i], videoID + i);
+      i == imagePrompts.length - 1
+        ? await getImage(imagePrompts[i], videoID + i)
+        : getImage(imagePrompts[i], videoID + i);
       imageUrls.push(baseUrl + "/file/" + videoID + i + ".jpg");
     }
 
     for (let i = 0; i < voiceScripts.length; i++) {
       console.log("getting audio " + i);
-      const audioUrl = await getSpeech(voiceScripts[i], videoID + i);
-      audioUrls.push(audioUrl);
+      const audioData = await getSpeech(voiceScripts[i], videoID + i);
+      audioUrls.push(audioData.url);
+      durationInSeconds.push(audioData.duration);
     }
 
     const video = new Video({
@@ -47,13 +51,14 @@ const createVideoContent = async (req, res) => {
       imagePrompts,
       imageUrls,
       audioUrls,
+      durationInSeconds,
     });
 
     await video.save();
 
     setTimeout(() => {
       res.status(200).json(video);
-    }, 20000);
+    }, 5000);
   } catch (error) {
     console.log(error);
     res.status(500).send("Error creating video content");

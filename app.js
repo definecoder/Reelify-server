@@ -2,6 +2,8 @@ const express = require("express");
 const dotenv = require("dotenv");
 const multer = require("multer");
 
+const { spawn } = require("child_process");
+
 const {
   S3Client,
   PutObjectCommand,
@@ -71,7 +73,11 @@ app.get("/image/:imageName", async (req, res) => {
 
     const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
-    res.send(url);
+    // get duration of audio
+    const duration = await getAudioDuration(url);
+    console.log("Duration:", duration);
+
+    res.send({ url, duration });
   } catch (error) {
     console.log(error);
     res.status(500).send("Error getting image");
@@ -100,3 +106,26 @@ app.delete("/image/:imageName", async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+const getAudioDuration = (url) => {
+  return new Promise((resolve, reject) => {
+    const ffprobe = spawn("ffprobe", [
+      "-v",
+      "error",
+      "-show_entries",
+      "format=duration",
+      "-of",
+      "default=noprint_wrappers=1:nokey=1",
+      url,
+    ]);
+
+    ffprobe.stdout.on("data", (data) => {
+      const durationInSeconds = Math.ceil(parseFloat(data.toString()));
+      resolve(durationInSeconds);
+    });
+
+    ffprobe.stderr.on("data", (data) => {
+      reject(data.toString());
+    });
+  });
+};

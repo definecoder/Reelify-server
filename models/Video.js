@@ -27,6 +27,11 @@ const VideoSchema = new mongoose.Schema({
   finalAudioUrl: {
     type: String,
   },
+  durationInSeconds: [
+    {
+      type: Number,
+    },
+  ],
 
   createdBy: {
     type: String,

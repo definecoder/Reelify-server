@@ -6,6 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const OpenAI = require("openai");
 const dotenv = require("dotenv");
+const { parseBuffer } = require("music-metadata");
 
 const {
   S3Client,
@@ -14,6 +15,7 @@ const {
   DeleteObjectCommand,
 } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const getAudioDuration = require("./duration");
 dotenv.config();
 const bucketName = process.env.AWS_BUCKET_NAME;
 const bucketRegion = process.env.AWS_REGION;
@@ -31,12 +33,6 @@ const s3 = new S3Client({
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-// check if speeches folder exists, if not create it
-const speechLocation = `${__dirname}/../speeches`;
-if (!fs.existsSync(speechLocation)) {
-  fs.mkdirSync(speechLocation);
-}
 
 async function getSpeech(text, fileName) {
   try {
@@ -66,7 +62,10 @@ async function getSpeech(text, fileName) {
 
     const url = await getSignedUrl(s3, command);
 
-    return url;
+    let durationInSeconds = await getAudioDurationFromBuffer(buffer);
+    durationInSeconds = Math.ceil(durationInSeconds);
+
+    return { url, duration: durationInSeconds };
   } catch (error) {
     console.log(error);
     throw error;
@@ -84,5 +83,21 @@ async function getSpeech(text, fileName) {
 //     root: __dirname + "/..",
 //   });
 // };
+const getAudioDurationFromBuffer = async (buffer) => {
+  try {
+    // Parse the buffer to extract metadata
+    const metadata = await parseBuffer(buffer, "audio/mpeg", {
+      duration: true,
+    });
+
+    // Extract duration from metadata
+    const durationInSeconds = metadata.format.duration;
+
+    return durationInSeconds;
+  } catch (error) {
+    console.error("Error parsing audio buffer:", error);
+    throw error;
+  }
+};
 
 module.exports = { getSpeech };
