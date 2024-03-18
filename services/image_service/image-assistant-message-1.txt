@@ -1,0 +1,7 @@
+{
+"imagePrompt1": "show a hungry wolf in a field with shepherds keeping a close watch on the sheep",
+"imagePrompt2": "show the wolf finding a discarded sheepskin",
+"imagePrompt3": "show the wolf wearing the sheepskin and walking among the sheep in the pasture",
+"imagePrompt4": "show a little lamb following the disguised wolf, unaware of the danger",
+"imagePrompt5": "show the disguised wolf entering the sheepfold with the flock",
+}
