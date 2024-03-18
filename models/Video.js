@@ -19,7 +19,7 @@ const VideoSchema = new mongoose.Schema({
       type: String,
     },
   ],
-  imageScripts: [
+  imagePrompts: [
     {
       type: String,
     },
