@@ -10,7 +10,11 @@ const baseUrl = require("../utils/constants");
 
 const createVideoContent = async (req, res) => {
   try {
-    console.log("api hit, getting voice script");
+    res.set("content-type", "application/json");
+
+    res.write('{"message": "Video creation completed", "video":');
+
+    // console.log("api hit, getting voice script");
     const { text } = req.body;
 
     const videoID = crypto.randomBytes(16).toString("hex");
@@ -57,7 +61,8 @@ const createVideoContent = async (req, res) => {
     await video.save();
 
     setTimeout(() => {
-      res.status(200).json(video);
+      res.write(JSON.stringify(video) + "}");
+      res.end();
     }, 5000);
   } catch (error) {
     console.log(error);
