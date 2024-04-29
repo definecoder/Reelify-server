@@ -10,9 +10,9 @@ const baseUrl = require("../utils/constants");
 
 const createVideoContent = async (req, res) => {
   try {
-    res.set("content-type", "application/json");
+    // res.set("content-type", "application/json");
 
-    res.write('{"message": "Video creation completed", "video":');
+    // res.write('{"message": "Video creation completed", "video":');
 
     console.log("api hit, getting voice script");
     const { text } = req.body;
@@ -67,10 +67,13 @@ const createVideoContent = async (req, res) => {
 
     await video.save();
 
-    res.write(JSON.stringify(video) + "}");
-    res.end();
+    res.status(201).json(video);
+    // res.write(JSON.stringify(video) + "}");
+    // res.end();
   } catch (error) {
     console.log(error);
+    // res.write('{"message": "Error creating video content"}');
+    // res.end();
     res.status(500).send("Error creating video content");
   }
 };

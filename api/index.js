@@ -1,9 +1,9 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const corsConfig = require("../utils/cors-config");
+dotenv.config();
 const videoContentRoutes = require("../routes/video-content");
 const fileServerRoutes = require("../routes/file-server");
-dotenv.config();
 require("../db/database");
 
 const app = express();
@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-app.listen(port, () => {
+app.listen(port, () => {  
   console.log(`Server is running on port ${port}`);
 });
 
