@@ -1,4 +1,5 @@
-const baseUrl = "https://reelify-server-smoky.vercel.app/";
+// const baseUrl = "https://reelify-server-smoky.vercel.app/";
+const baseUrl = "http://localhost:7171";
 
 // export this base url
 

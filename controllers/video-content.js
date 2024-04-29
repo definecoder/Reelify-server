@@ -14,7 +14,7 @@ const createVideoContent = async (req, res) => {
 
     res.write('{"message": "Video creation completed", "video":');
 
-    // console.log("api hit, getting voice script");
+    console.log("api hit, getting voice script");
     const { text } = req.body;
 
     const videoID = crypto.randomBytes(16).toString("hex");
@@ -34,11 +34,16 @@ const createVideoContent = async (req, res) => {
     const audioUrls = [];
     const durationInSeconds = [];
 
+    const imagePromises = [];
+
     for (let i = 0; i < imagePrompts.length; i++) {
       console.log("getting image " + i);
-      i == imagePrompts.length - 1
-        ? await getImage(imagePrompts[i], videoID + i)
-        : getImage(imagePrompts[i], videoID + i);
+      // i == imagePrompts.length - 1
+      //   ? await getImage(imagePrompts[i], videoID + i)
+      //   : getImage(imagePrompts[i], videoID + i);
+
+      imagePromises.push(getImage(imagePrompts[i], videoID + i));
+
       imageUrls.push(baseUrl + "/file/" + videoID + i + ".jpg");
     }
 
@@ -48,6 +53,8 @@ const createVideoContent = async (req, res) => {
       audioUrls.push(audioData.url);
       durationInSeconds.push(audioData.duration);
     }
+
+    await Promise.all([...imagePromises]);
 
     const video = new Video({
       videoID,
@@ -60,10 +67,8 @@ const createVideoContent = async (req, res) => {
 
     await video.save();
 
-    setTimeout(() => {
-      res.write(JSON.stringify(video) + "}");
-      res.end();
-    }, 5000);
+    res.write(JSON.stringify(video) + "}");
+    res.end();
   } catch (error) {
     console.log(error);
     res.status(500).send("Error creating video content");

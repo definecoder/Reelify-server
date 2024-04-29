@@ -61,6 +61,46 @@ app.post("/upload", upload.single("image"), async (req, res) => {
   }
 });
 
+app.get("/test", (req, res) => {
+  console.log("api hit, getting voice scripts");
+
+  res.setHeader("Content-Type", "application/json");
+
+  res.write(`{"message": "Video creation completed"`);
+
+  setTimeout(() => {
+    console.log("voice scripts received");
+
+    res.write("voice script received");
+
+    setTimeout(() => {
+      console.log("image prompts received");
+      res.write("image prompts received");
+
+      setTimeout(() => {
+        console.log("image urls received");
+        res.write("image urls received");
+
+        setTimeout(() => {
+          console.log("audio urls received");
+          res.write("audio urls received");
+
+          setTimeout(() => {
+            console.log("video created");
+
+            const retOBj = {
+              videoID: "1234",
+            };
+
+            res.write(JSON.stringify(retOBj));
+            res.end("}");
+          }, 3000);
+        }, 3000);
+      }, 3000);
+    }, 3000);
+  }, 3000);
+});
+
 app.get("/image/:imageName", async (req, res) => {
   try {
     const imageName = req.params.imageName;

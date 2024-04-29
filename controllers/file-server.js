@@ -1,11 +1,15 @@
 const { getFile, deleteFile } = require("../services/aws/file-server");
+const axios = require("axios");
 
 const getFileFromAWS = async (req, res) => {
   try {
     const url = await getFile(req.params.fileName);
-    // this url refers to the file in the AWS S3 bucket
-    // I want to send a response that will show the image in the browser
-    res.send(`<img src="${url}" alt="Image from AWS S3">`);
+
+    const response = await axios.get(url, { responseType: "stream" });
+
+    res.setHeader("Content-Type", response.headers["content-type"]);
+
+    response.data.pipe(res);
   } catch (error) {
     console.log(error);
     res.status(500).send("Error getting file");

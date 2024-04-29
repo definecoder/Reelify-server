@@ -60,7 +60,9 @@ async function getSpeech(text, fileName) {
 
     const command = new GetObjectCommand(params);
 
-    const url = await getSignedUrl(s3, command);
+    const url = await getSignedUrl(s3, command, {
+      expiresIn: 60 * 60 * 24 * 7,
+    });
 
     let durationInSeconds = await getAudioDurationFromBuffer(buffer);
     durationInSeconds = Math.ceil(durationInSeconds);
