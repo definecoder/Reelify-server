@@ -30,11 +30,7 @@ const s3 = new S3Client({
   },
 });
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-async function getSpeech(text, fileName) {
+async function getSpeech(text, fileName, openai) {
   try {
     const mp3 = await openai.audio.speech.create({
       model: "tts-1",

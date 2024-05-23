@@ -38,11 +38,7 @@ let converstationHistory = [
   },
 ];
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const getImagePrompts = async (prompt) => {
+const getImagePrompts = async (prompt, openai) => {
   let result = "";
 
   converstationHistory.push({

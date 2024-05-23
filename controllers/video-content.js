@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const Video = require("../models/Video");
+const OpenAI = require("openai");
 const { getPrompt } = require("../services/text_service/prompt");
 const { getImagePrompts } = require("../services/image_service/image-prompts");
 const { getSpeech } = require("../services/audio_service/text-to-speech");
@@ -15,12 +16,16 @@ const createVideoContent = async (req, res) => {
     // res.write('{"message": "Video creation completed", "video":');
 
     console.log("api hit, getting voice script");
-    const { text } = req.body;
+    const { text, apiKey } = req.body;
+
+    const openai = new OpenAI({
+      apiKey: apiKey,
+    });
 
     const videoID = crypto.randomBytes(16).toString("hex");
 
-    var voiceScripts = await getPrompt(text);
-    var imagePrompts = await getImagePrompts(voiceScripts);
+    var voiceScripts = await getPrompt(text, openai);
+    var imagePrompts = await getImagePrompts(voiceScripts, openai);
     voiceScripts = voiceScripts.replace(/,\s*([\]}])/g, "$1");
     imagePrompts = imagePrompts.replace(/,\s*([\]}])/g, "$1");
 
@@ -42,14 +47,14 @@ const createVideoContent = async (req, res) => {
       //   ? await getImage(imagePrompts[i], videoID + i)
       //   : getImage(imagePrompts[i], videoID + i);
 
-      imagePromises.push(getImage(imagePrompts[i], videoID + i));
+      imagePromises.push(getImage(imagePrompts[i], videoID + i, openai));
 
       imageUrls.push(baseUrl + "/file/" + videoID + i + ".jpg");
     }
 
     for (let i = 0; i < voiceScripts.length; i++) {
       console.log("getting audio " + i);
-      const audioData = await getSpeech(voiceScripts[i], videoID + i);
+      const audioData = await getSpeech(voiceScripts[i], videoID + i, openai);
       audioUrls.push(audioData.url);
       durationInSeconds.push(audioData.duration);
     }

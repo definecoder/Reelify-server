@@ -36,11 +36,7 @@ let converstationHistory = [
 
 // console.log(process.env.OPENAI_API_KEY);
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const getPrompt = async (prompt) => {
+const getPrompt = async (prompt, openai) => {
   let result = "";
 
   converstationHistory.push({

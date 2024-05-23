@@ -30,11 +30,7 @@ const s3 = new S3Client({
   },
 });
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-async function getImage(text, id) {
+async function getImage(text, id, openai) {
   try {
     const image = await openai.images.generate({
       model: "dall-e-3",
