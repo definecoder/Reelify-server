@@ -7,6 +7,8 @@ const { getSpeech } = require("../services/audio_service/text-to-speech");
 const { getImage } = require("../services/image_service/image");
 const baseUrl = require("../utils/constants");
 
+const VIDEO_PER_PAGE = 10;
+
 // console.log(baseUrl);
 
 const createVideoContent = async (req, res) => {
@@ -62,6 +64,7 @@ const createVideoContent = async (req, res) => {
     await Promise.all([...imagePromises]);
 
     const video = new Video({
+      prompt: text,
       videoID,
       voiceScripts,
       imagePrompts,
@@ -100,4 +103,25 @@ const getVideoContentByID = async (req, res) => {
   }
 };
 
-module.exports = { createVideoContent, getVideoContentByID };
+const getAllVideoContents = async (req, res) => {
+  try {
+    const { page } = req.query;
+
+    const videos = await Video.find()
+      .select("-_id -__v")
+      .sort({ createdAt: "desc" })
+      .skip((page - 1) * VIDEO_PER_PAGE)
+      .limit(VIDEO_PER_PAGE)
+      .exec();
+    res.status(200).json(videos);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Error getting all video contents");
+  }
+};
+
+module.exports = {
+  createVideoContent,
+  getVideoContentByID,
+  getAllVideoContents,
+};

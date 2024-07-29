@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const VideoSchema = new mongoose.Schema({
+  prompt: {
+    type: String,
+  },
+
   videoID: {
     type: String,
   },
